@@ -1,0 +1,28 @@
+[project]
+name = "bili-crawler"
+version = "0.1.0"
+description = "B站视频逐字稿提取工具 — API优先，ASR兜底，零AI消耗"
+authors = [{name = "茶修"}]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.8"
+
+dependencies = [
+    "requests>=2.25",
+]
+
+[project.scripts]
+bili-crawl = "bili_crawler.cli:main"
+
+[project.optional-dependencies]
+asr = [
+    "openai-whisper>=20231117",
+]
+all = [
+    "bili-crawler[asr]",
+    "yt-dlp>=2023",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
