@@ -17,13 +17,13 @@ def process(bvid, get_comments=False):
     if info is None:
         return json.dumps({"error": "video not found"}, ensure_ascii=False)
 
-    # ASR: 下载音频 → Whisper 转写（核心路径）
-    print(f"  ↓ 下载音频...", file=sys.stderr)
+    # 唯一路径：下载音频 → Whisper 转写
+    print(f"  → 下载音频...", file=sys.stderr)
     audio = asr.download_audio(bvid)
     if not audio:
         return json.dumps({"error": "audio download failed"}, ensure_ascii=False)
 
-    print(f"  ↓ 语音转写...", file=sys.stderr)
+    print(f"  → 语音转写...", file=sys.stderr)
     lines = asr.transcribe(audio)
     asr.cleanup(audio)
 
@@ -32,9 +32,12 @@ def process(bvid, get_comments=False):
     if get_comments:
         try:
             from . import comments as cm
-            cm.extract(bvid)
+            comments = cm.extract(bvid)
+        except ImportError:
+            print(f"  ⚠ 评论需Playwright", file=sys.stderr)
+            comments = []
         except Exception as e:
-            print(f"  ⚠ 评论提取失败: {e}", file=sys.stderr)
+            print(f"  ⚠ 评论失败: {e}", file=sys.stderr)
             comments = []
 
     return output_json(info, lines, comments)
@@ -43,7 +46,6 @@ def search_and_process(keyword, top=5, get_comments=False):
     results = api.search(keyword)
     if not results:
         return json.dumps({"error": "no results"}, ensure_ascii=False)
-
     out = []
     for v in results[:top]:
         w = round(v["views"] / 10000, 1)
@@ -53,7 +55,7 @@ def search_and_process(keyword, top=5, get_comments=False):
     return json.dumps(out, ensure_ascii=False, indent=2)
 
 def main():
-    p = argparse.ArgumentParser(description=f"bili-crawler v{VERSION} — B站视频逐字稿提取")
+    p = argparse.ArgumentParser(description="bili-crawler — B站视频逐字稿提取")
     p.add_argument("input", help="BVID / B站URL / 搜索关键词")
     p.add_argument("--top", type=int, default=0, help="搜索前N条")
     p.add_argument("--comments", action="store_true", help="同时提取评论区（需Playwright）")
