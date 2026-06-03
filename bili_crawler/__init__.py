@@ -1,2 +1,2 @@
-"""bili-crawler - B站视频逐字稿提取工具"""
-__version__ = "0.1.0"
+"""bili-crawler — B站视频逐字稿提取工具"""
+__version__ = "1.0.0"
