@@ -1,6 +1,14 @@
 """ASR 核心 — yt-dlp 下载音频 + Whisper 转写"""
 import subprocess, os, tempfile
 
+# 自动定位 ffmpeg（优先用 imageio_ffmpeg 自带的静态二进制）
+_FFMPEG_PATH = None
+try:
+    import imageio_ffmpeg
+    _FFMPEG_PATH = imageio_ffmpeg.get_ffmpeg_exe()
+except ImportError:
+    pass
+
 def download_audio(bvid, output_dir=None):
     if output_dir is None:
         output_dir = tempfile.gettempdir()
@@ -18,6 +26,9 @@ def download_audio(bvid, output_dir=None):
 def transcribe(audio_path, model_size="tiny", language="zh"):
     import whisper
     model = whisper.load_model(model_size)
+    # 如果找到静态 ffmpeg，设置环境变量让 whisper 用它
+    if _FFMPEG_PATH:
+        os.environ["IMAGEIO_FFMPEG_EXE"] = _FFMPEG_PATH
     result = model.transcribe(audio_path, language=language)
     return [seg["text"].strip() for seg in result.get("segments", []) if seg.get("text","").strip()]
 

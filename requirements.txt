@@ -1,1 +1,4 @@
-requests>=2.25
+openai-whisper
+yt-dlp
+imageio-ffmpeg
+playwright
