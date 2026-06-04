@@ -73,3 +73,14 @@ bili-crawler/
 ├── README.md
 └── pyproject.toml
 ```
+
+---
+
+## douyin-crawler（同仓库子模块）
+
+抖音视频逐字稿提取。原理同上：yt-dlp + Whisper，零token。
+
+```bash
+python -m douyin_crawler.cli 7575127938014694706
+python -m douyin_crawler.cli 7575127938014694706 --comments
+```
